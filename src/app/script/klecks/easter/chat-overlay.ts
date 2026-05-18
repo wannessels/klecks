@@ -41,13 +41,32 @@ export class ChatOverlay {
         const row = document.createElement('div');
         row.className = styles.inputRow;
 
+        let attachInput: HTMLInputElement | undefined;
         if (opts.allowImageUpload) {
             const attach = document.createElement('button');
             attach.className = styles.attach;
             attach.setAttribute('data-testid', 'chat-attach');
             attach.textContent = '+';
+            attachInput = document.createElement('input');
+            attachInput.type = 'file';
+            attachInput.accept = 'image/*';
+            attachInput.style.display = 'none';
+            attachInput.setAttribute('data-testid', 'chat-attach-input');
+            attach.addEventListener('click', () => attachInput!.click());
+            attachInput.addEventListener('change', async () => {
+                const f = attachInput!.files?.[0];
+                attachInput!.value = '';
+                if (!f) return;
+                try {
+                    const { prepareImageForSend } = await import('./prepare-image-for-send');
+                    const base64 = await prepareImageForSend(f);
+                    this.opts.onSendImage?.(base64);
+                } catch (e) {
+                    console.error('[chat] image prep failed', e);
+                }
+            });
             row.append(attach);
-            // Wiring to file picker lands in Task 8.
+            row.append(attachInput);
         }
 
         this.inputEl = document.createElement('input');
@@ -79,7 +98,7 @@ export class ChatOverlay {
 
     renderIncoming(msg: { kind: 'text'; text: string; mine: boolean } | { kind: 'image'; data: string; mine: boolean }) {
         if (msg.kind === 'text') this.appendTextBubble(msg.text, msg.mine);
-        // image branch lands in Task 8.
+        else this.appendImageBubble(msg.data, msg.mine);
     }
 
     show() {
@@ -96,6 +115,22 @@ export class ChatOverlay {
         if (!text) return;
         this.opts.onSendText?.(text);
         this.inputEl.value = '';
+    }
+
+    private appendImageBubble(base64: string, mine: boolean) {
+        const wrap = document.createElement('div');
+        wrap.className = `${styles.bubble} ${mine ? styles.mine : styles.theirs}`;
+        wrap.setAttribute('data-testid', mine ? 'chat-bubble-mine' : 'chat-bubble-theirs');
+        const img = document.createElement('img');
+        img.src = `data:image/jpeg;base64,${base64}`;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '240px';
+        img.style.cursor = 'pointer';
+        img.setAttribute('data-testid', 'chat-image-thumb');
+        // Lightbox wiring lands in Task 9.
+        wrap.append(img);
+        this.messagesEl.append(wrap);
+        this.scrollToBottomIfNotPinned();
     }
 
     private appendTextBubble(text: string, mine: boolean) {

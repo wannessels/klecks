@@ -72,7 +72,20 @@ httpServer.on('upgrade', (req, socket, head) => {
                     mine: recipient === capturedSide,
                 }));
             }
-            // image branch lands in Task 8.
+            if (msg.kind === 'image' && typeof msg.data === 'string') {
+                let bytes: Buffer;
+                try {
+                    bytes = Buffer.from(msg.data, 'base64');
+                } catch { return; }
+                if (bytes.length === 0) return;
+                store.insertImage(capturedSide, bytes);
+                room.broadcast(capturedSide, (recipient) => ({
+                    type: 'message',
+                    kind: 'image',
+                    data: bytes.toString('base64'),
+                    mine: recipient === capturedSide,
+                }));
+            }
         });
 
         ws.on('close', () => {

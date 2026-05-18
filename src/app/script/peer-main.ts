@@ -7,6 +7,7 @@ const overlay = new ChatOverlay({
     closeable: false,
     allowImageUpload: true,
     onSendText: (t) => client.sendText(t),
+    onSendImage: (b) => client.sendImage(b),
 });
 client = new ChatClient({
     url: resolveChatUrl('peer'),
