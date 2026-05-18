@@ -10,7 +10,7 @@
     "ios_saf 9"
   ],
   "scripts": {
-    "start": "cross-env CHAT_WS_URL=ws://localhost:8080 parcel serve src/index.html --no-cache",
+    "start": "parcel serve src/index.html --no-cache",
     "build": "parcel build src/index.html",
     "build:embed": "parcel build src/embed.ts",
     "build:help": "parcel build src/help.html --public-url .",
@@ -34,7 +34,6 @@
     "transformation-matrix": "3.1.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "cross-env": "^10.1.0"
+    "@playwright/test": "^1.60.0"
   }
 }
