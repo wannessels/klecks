@@ -8,3 +8,10 @@ src/app/languages
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Chat server runtime artifacts
+server/chat.db*
+server/dist/
+
+# Cygwin/MSYS crash artifacts
+bash.exe.stackdump

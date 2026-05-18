@@ -32,5 +32,10 @@ export default defineConfig({
             use: { ...devices['Desktop Chrome'] },
             testMatch: /smoke\.spec\.ts$/,
         },
+        {
+            name: 'server',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: /server-.*\.spec\.ts$/,
+        },
     ],
 });
