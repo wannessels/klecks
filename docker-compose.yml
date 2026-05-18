@@ -1,8 +1,13 @@
 version: '3'
 
 services:
-  klecks:
-    build: .
-    container_name: klecks
-    ports:
-     - 5050:3000
+    klecks:
+        build: .
+        container_name: klecks
+        ports:
+            - 5050:3000
+        volumes:
+            - chat-data:/var/www/chat-data
+
+volumes:
+    chat-data:
