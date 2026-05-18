@@ -10,13 +10,16 @@
     "ios_saf 9"
   ],
   "scripts": {
-    "start": "parcel serve src/index.html --no-cache",
+    "start": "parcel serve src/index.html src/peer.html --no-cache",
     "build": "parcel build src/index.html",
     "build:embed": "parcel build src/embed.ts",
     "build:help": "parcel build src/help.html --public-url .",
+    "build:peer": "parcel build src/peer.html",
     "lang:add": "node src/languages/generate.js add",
     "lang:sync": "node src/languages/generate.js sync",
-    "lang:build": "node src/languages/generate.js build"
+    "lang:build": "node src/languages/generate.js build",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@parcel/transformer-glsl": "2.16.4",
@@ -29,5 +32,8 @@
     "parcel": "2.16.4",
     "polygon-clipping": "0.15.7",
     "transformation-matrix": "3.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
   }
 }

@@ -349,6 +349,7 @@ export class ToolspaceToolRow {
         this.handButton.el.classList.add('kl-tool-row-border-right');
         this.handButton.el.title = LANG('tool-hand');
         this.rootEl.append(this.handButton.el);
+        this.handButton.el.setAttribute('data-testid', 'tool-hand');
 
         this.zoomInNOutButton = createTriangleButton({
             onLeft: p.onZoomIn,
