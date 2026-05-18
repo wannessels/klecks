@@ -7,8 +7,7 @@ let client: ChatClient | undefined;
 
 export function showChatOverlay(): void {
     if (!overlay) {
-        client = new ChatClient({ url: resolveChatUrl('klecks') });
-        overlay = new ChatOverlay({
+        const localOverlay = new ChatOverlay({
             closeable: true,
             allowImageUpload: false,
             onClose: () => {
@@ -18,6 +17,15 @@ export function showChatOverlay(): void {
             },
             onSendText: (t) => client?.sendText(t),
         });
+        const localClient = new ChatClient({
+            url: resolveChatUrl('klecks'),
+            onMessage: (m) => {
+                if (m.type === 'message') localOverlay.renderIncoming(m);
+                else if (m.type === 'history') for (const e of m.messages) localOverlay.renderIncoming({ ...e, mine: e.mine });
+            },
+        });
+        overlay = localOverlay;
+        client = localClient;
     }
     overlay.show();
 }

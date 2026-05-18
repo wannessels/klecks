@@ -77,6 +77,11 @@ export class ChatOverlay {
 
     getElement() { return this.rootEl; }
 
+    renderIncoming(msg: { kind: 'text'; text: string; mine: boolean } | { kind: 'image'; data: string; mine: boolean }) {
+        if (msg.kind === 'text') this.appendTextBubble(msg.text, msg.mine);
+        // image branch lands in Task 8.
+    }
+
     show() {
         if (!this.rootEl.isConnected) document.body.append(this.rootEl);
     }
@@ -91,5 +96,19 @@ export class ChatOverlay {
         if (!text) return;
         this.opts.onSendText?.(text);
         this.inputEl.value = '';
+    }
+
+    private appendTextBubble(text: string, mine: boolean) {
+        const el = document.createElement('div');
+        el.className = `${styles.bubble} ${mine ? styles.mine : styles.theirs}`;
+        el.setAttribute('data-testid', mine ? 'chat-bubble-mine' : 'chat-bubble-theirs');
+        el.textContent = text;
+        this.messagesEl.append(el);
+        this.scrollToBottomIfNotPinned();
+    }
+
+    private scrollToBottomIfNotPinned() {
+        // Simple version: always pin to bottom for now. Refined later if needed.
+        this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
     }
 }

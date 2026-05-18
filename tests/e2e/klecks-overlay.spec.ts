@@ -70,3 +70,17 @@ test('opening the overlay opens a WS to /chat/klecks', async ({ page }) => {
     await page.waitForTimeout(500); // give the client time to connect
     expect(wsUrls.some((u) => u.endsWith('/chat/klecks'))).toBe(true);
 });
+
+test('typing + send produces a sent-bubble via server round-trip', async ({ page }) => {
+    const klecks = new KlecksPage(page);
+    const overlay = new ChatOverlayPage(page);
+    await klecks.goto();
+    await openOverlay(klecks);
+
+    const stamp = `klecks-${Date.now()}`;
+    await overlay.input().fill(`hello ${stamp}`);
+    await overlay.sendButton().tap();
+
+    const myBubble = overlay.root().getByTestId('chat-bubble-mine').filter({ hasText: `hello ${stamp}` });
+    await expect(myBubble).toBeVisible();
+});

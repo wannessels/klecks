@@ -49,11 +49,28 @@ httpServer.on('upgrade', (req, socket, head) => {
         room.add(conn);
         console.log(`[ws] connect side=${capturedSide}`);
 
+        ws.on('message', (data) => {
+            let msg: any;
+            try { msg = JSON.parse(data.toString()); } catch { return; }
+            if (!msg || msg.type !== 'send') return;
+            if (msg.kind === 'text' && typeof msg.text === 'string') {
+                const text = msg.text.trim();
+                if (!text) return;
+                store.insertText(capturedSide, text);
+                room.broadcast(capturedSide, (recipient) => ({
+                    type: 'message',
+                    kind: 'text',
+                    text,
+                    mine: recipient === capturedSide,
+                }));
+            }
+            // image branch lands in Task 8.
+        });
+
         ws.on('close', () => {
             room.remove(conn);
             console.log(`[ws] disconnect side=${capturedSide}`);
         });
-        // Message handling lands in Task 5.
     });
 });
 
