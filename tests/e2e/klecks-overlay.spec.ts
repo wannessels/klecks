@@ -55,3 +55,18 @@ test('klecks side does NOT render the attach-image button', async ({ page }) => 
 
     await expect(overlay.attachButton()).toHaveCount(0);
 });
+
+test('opening the overlay opens a WS to /chat/klecks', async ({ page }) => {
+    const klecks = new KlecksPage(page);
+    const overlay = new ChatOverlayPage(page);
+
+    const wsUrls: string[] = [];
+    page.on('websocket', (ws) => wsUrls.push(ws.url()));
+
+    await klecks.goto();
+    await openOverlay(klecks);
+
+    await expect(overlay.root()).toBeVisible();
+    await page.waitForTimeout(500); // give the client time to connect
+    expect(wsUrls.some((u) => u.endsWith('/chat/klecks'))).toBe(true);
+});
