@@ -57,3 +57,26 @@ test('text travels from peer (iPhone) to klecks (iPad)', async ({ browser }) => 
     await ipad.close();
     await phone.close();
 });
+
+test('after reload, klecks sees its prior sent messages right-aligned', async ({ browser }) => {
+    const ipad = await browser.newContext({ ...devices['iPad (gen 7) landscape'] });
+    const ipadPage = await ipad.newPage();
+    const klecks = new KlecksPage(ipadPage);
+    const overlay = new ChatOverlayPage(ipadPage);
+
+    await klecks.goto();
+    await openKlecksOverlay(klecks);
+
+    const stamp = `reload-${Date.now()}`;
+    await overlay.input().fill(`persistent ${stamp}`);
+    await overlay.sendButton().tap();
+    await expect(overlay.root().getByTestId('chat-bubble-mine').filter({ hasText: stamp })).toBeVisible();
+
+    // Reload and reopen the overlay.
+    await ipadPage.reload();
+    await klecks.goto(); // re-runs the loading-screen wait
+    await openKlecksOverlay(klecks);
+
+    await expect(overlay.root().getByTestId('chat-bubble-mine').filter({ hasText: stamp })).toBeVisible({ timeout: 5_000 });
+    await ipad.close();
+});

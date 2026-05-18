@@ -49,6 +49,14 @@ httpServer.on('upgrade', (req, socket, head) => {
         room.add(conn);
         console.log(`[ws] connect side=${capturedSide}`);
 
+        const history = store.lastN(50).map((row) => {
+            const mine = row.sender === capturedSide;
+            return row.kind === 'text'
+                ? { kind: 'text' as const, text: row.text, mine }
+                : { kind: 'image' as const, data: row.imageData.toString('base64'), mine };
+        });
+        ws.send(JSON.stringify({ type: 'history', messages: history }));
+
         ws.on('message', (data) => {
             let msg: any;
             try { msg = JSON.parse(data.toString()); } catch { return; }
