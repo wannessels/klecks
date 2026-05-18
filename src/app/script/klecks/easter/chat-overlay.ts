@@ -127,7 +127,10 @@ export class ChatOverlay {
         img.style.maxHeight = '240px';
         img.style.cursor = 'pointer';
         img.setAttribute('data-testid', 'chat-image-thumb');
-        // Lightbox wiring lands in Task 9.
+        img.addEventListener('click', async () => {
+            const { openImageLightbox } = await import('./image-lightbox');
+            openImageLightbox(base64);
+        });
         wrap.append(img);
         this.messagesEl.append(wrap);
         this.scrollToBottomIfNotPinned();
