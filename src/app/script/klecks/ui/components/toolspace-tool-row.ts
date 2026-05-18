@@ -340,7 +340,14 @@ export class ToolspaceToolRow {
 
         this.handButton = createButton({
             onClick: () => {
-                this.setActive('hand', true);
+                // Always emit onActivate for hand-button clicks (bypasses the
+                // setActive dedup) so the easter-egg HandClickDetector can
+                // count consecutive taps on an already-active hand tool.
+                if (this.currentActiveStr === 'hand') {
+                    this.onActivate('hand');
+                } else {
+                    this.setActive('hand', true);
+                }
             },
             image: toolHandImg,
             contain: true,
@@ -348,6 +355,10 @@ export class ToolspaceToolRow {
         });
         this.handButton.el.classList.add('kl-tool-row-border-right');
         this.handButton.el.title = LANG('tool-hand');
+        // Keep the hand button tappable while activated. The default
+        // `.toolspace-row-button-activated` rule sets pointer-events: none,
+        // which would block the consecutive-tap easter-egg trigger.
+        this.handButton.el.style.pointerEvents = 'auto';
         this.rootEl.append(this.handButton.el);
         this.handButton.el.setAttribute('data-testid', 'tool-hand');
 
