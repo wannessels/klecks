@@ -1248,8 +1248,11 @@ export class KlApp {
         });
 
         this.toolspaceToolRow = new KL.ToolspaceToolRow({
+            onHandClick: () => handClickDetector.record('hand'),
             onActivate: (activeStr) => {
-                handClickDetector.record(activeStr);
+                if (activeStr !== 'hand') {
+                    handClickDetector.record(activeStr);
+                }
                 if (activeStr !== 'hand') {
                     // hand only one that doesn't cause changes
                     applyUncommitted();

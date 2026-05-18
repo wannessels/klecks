@@ -47,6 +47,7 @@ export class ToolspaceToolRow {
 
     constructor(p: {
         onActivate: (activeStr: TToolType) => void; // clicking on tool button - activating it
+        onHandClick?: () => void; // fires on every hand-button click, even while hand is already active
         onZoomIn: () => void;
         onZoomOut: () => void;
         onUndo: () => void;
@@ -340,14 +341,8 @@ export class ToolspaceToolRow {
 
         this.handButton = createButton({
             onClick: () => {
-                // Always emit onActivate for hand-button clicks (bypasses the
-                // setActive dedup) so the easter-egg HandClickDetector can
-                // count consecutive taps on an already-active hand tool.
-                if (this.currentActiveStr === 'hand') {
-                    this.onActivate('hand');
-                } else {
-                    this.setActive('hand', true);
-                }
+                p.onHandClick?.();
+                this.setActive('hand', true);
             },
             image: toolHandImg,
             contain: true,
