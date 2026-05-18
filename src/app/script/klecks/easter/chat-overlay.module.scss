@@ -1,0 +1,88 @@
+.chatOverlay {
+    position: fixed;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    right: max(8px, env(safe-area-inset-right));
+    width: 320px;
+    height: 420px;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    color: #222;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+}
+@media (max-width: 480px) {
+    .chatOverlay {
+        width: calc(100vw - 16px);
+        height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+}
+.header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px;
+    border-bottom: 1px solid #ddd;
+    flex-shrink: 0;
+}
+.close {
+    min-width: 44px;
+    min-height: 44px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.bubble {
+    max-width: 80%;
+    padding: 6px 10px;
+    border-radius: 12px;
+    word-wrap: break-word;
+}
+.bubble.mine {
+    align-self: flex-end;
+    background: #d8efff;
+}
+.bubble.theirs {
+    align-self: flex-start;
+    background: #eee;
+}
+.inputRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+}
+.input {
+    flex: 1;
+    min-height: 44px;
+    padding: 0 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+}
+.send, .attach {
+    min-width: 44px;
+    min-height: 44px;
+    background: #d8efff;
+    border: 1px solid #aac;
+    border-radius: 4px;
+    cursor: pointer;
+    touch-action: manipulation;
+}

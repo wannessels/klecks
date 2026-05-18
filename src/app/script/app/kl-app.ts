@@ -83,6 +83,7 @@ import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { ToolspaceTopRow } from '../klecks/ui/components/toolspace-top-row';
 import { HandClickDetector } from '../klecks/easter/hand-click-detector';
+import { showChatOverlay } from '../klecks/easter/show-chat-overlay';
 
 importFilters();
 
@@ -1236,15 +1237,7 @@ export class KlApp {
         this.toolspaceInner.append(this.toolspaceTopRow.getElement());
 
         const handClickDetector = new HandClickDetector({
-            onTrigger: () => {
-                // Stub: append a placeholder element. Task 2 replaces this with the real overlay.
-                if (document.querySelector('[data-testid="chat-overlay"]')) return;
-                const el = document.createElement('div');
-                el.setAttribute('data-testid', 'chat-overlay');
-                el.style.cssText =
-                    'position:fixed;bottom:8px;right:8px;width:320px;height:420px;background:#fff;z-index:9999;';
-                document.body.append(el);
-            },
+            onTrigger: () => showChatOverlay(),
         });
 
         this.toolspaceToolRow = new KL.ToolspaceToolRow({
