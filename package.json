@@ -10,7 +10,7 @@
     "ios_saf 9"
   ],
   "scripts": {
-    "start": "parcel serve src/index.html --no-cache",
+    "start": "parcel serve src/index.html src/peer.html --no-cache",
     "build": "parcel build src/index.html",
     "build:embed": "parcel build src/embed.ts",
     "build:help": "parcel build src/help.html --public-url .",
