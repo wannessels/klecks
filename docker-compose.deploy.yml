@@ -1,0 +1,9 @@
+services:
+    klecks:
+        image: ghcr.io/wannessels/klecks:latest
+        container_name: klecks
+        restart: unless-stopped
+        ports:
+            - 5050:3000
+        volumes:
+            - ./chat-data:/var/www/chat-data
