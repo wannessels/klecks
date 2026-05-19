@@ -3,6 +3,8 @@ import styles from './chat-overlay.module.scss';
 export type TChatOverlayOptions = {
     closeable: boolean;
     allowImageUpload: boolean;
+    /** If provided, the overlay matches this element's bounding rect instead of filling the viewport. */
+    anchorEl?: HTMLElement;
     onClose?: () => void;
     onSendText?: (text: string) => void;
     onSendImage?: (base64Jpeg: string) => void;
@@ -13,6 +15,8 @@ export class ChatOverlay {
     private readonly messagesEl: HTMLElement;
     private readonly inputEl: HTMLInputElement;
     private readonly opts: TChatOverlayOptions;
+    private resizeObserver: ResizeObserver | undefined;
+    private readonly onWindowResize = () => this.syncToAnchor();
 
     constructor(opts: TChatOverlayOptions) {
         this.opts = opts;
@@ -24,12 +28,9 @@ export class ChatOverlay {
         if (opts.closeable) {
             const header = document.createElement('div');
             header.className = styles.header;
-            const close = document.createElement('button');
-            close.className = styles.close;
-            close.setAttribute('data-testid', 'chat-close');
-            close.textContent = '×';
-            close.addEventListener('click', () => this.hide());
-            header.append(close);
+            header.setAttribute('data-testid', 'chat-close');
+            header.textContent = '×';
+            header.addEventListener('click', () => this.hide());
             this.rootEl.append(header);
         }
 
@@ -103,11 +104,52 @@ export class ChatOverlay {
 
     show() {
         if (!this.rootEl.isConnected) document.body.append(this.rootEl);
+        if (this.opts.anchorEl) {
+            this.syncToAnchor();
+            this.resizeObserver = new ResizeObserver(() => this.syncToAnchor());
+            this.resizeObserver.observe(this.opts.anchorEl);
+            window.addEventListener('resize', this.onWindowResize);
+            window.visualViewport?.addEventListener('resize', this.onWindowResize);
+            window.visualViewport?.addEventListener('scroll', this.onWindowResize);
+        }
     }
 
     hide() {
         if (this.rootEl.isConnected) this.rootEl.remove();
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = undefined;
+        }
+        window.removeEventListener('resize', this.onWindowResize);
+        window.visualViewport?.removeEventListener('resize', this.onWindowResize);
+        window.visualViewport?.removeEventListener('scroll', this.onWindowResize);
         this.opts.onClose?.();
+    }
+
+    private syncToAnchor() {
+        const anchor = this.opts.anchorEl;
+        if (!anchor) return;
+        const rect = anchor.getBoundingClientRect();
+        // Clamp to the visual viewport so the on-screen keyboard can't push the
+        // header off-screen on mobile (iOS scrolls fixed elements with the page
+        // when the keyboard opens; visualViewport reflects the actually visible area).
+        const vv = window.visualViewport;
+        const vvLeft = vv ? vv.offsetLeft : 0;
+        const vvTop = vv ? vv.offsetTop : 0;
+        const vvRight = vv ? vv.offsetLeft + vv.width : window.innerWidth;
+        const vvBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+        const left = Math.max(rect.left, vvLeft);
+        const top = Math.max(rect.top, vvTop);
+        const right = Math.min(rect.right, vvRight);
+        const bottom = Math.min(rect.bottom, vvBottom);
+        Object.assign(this.rootEl.style, {
+            left: left + 'px',
+            top: top + 'px',
+            right: 'auto',
+            bottom: 'auto',
+            width: Math.max(0, right - left) + 'px',
+            height: Math.max(0, bottom - top) + 'px',
+        });
     }
 
     private submit() {

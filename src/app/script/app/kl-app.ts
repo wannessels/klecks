@@ -1237,7 +1237,7 @@ export class KlApp {
         this.toolspaceInner.append(this.toolspaceTopRow.getElement());
 
         const handClickDetector = new HandClickDetector({
-            onTrigger: () => showChatOverlay(),
+            onTrigger: () => showChatOverlay(this.easel.getElement()),
         });
 
         this.toolspaceToolRow = new KL.ToolspaceToolRow({

@@ -5,11 +5,12 @@ import { resolveChatUrl } from './resolve-chat-url';
 let overlay: ChatOverlay | undefined;
 let client: ChatClient | undefined;
 
-export function showChatOverlay(): void {
+export function showChatOverlay(anchorEl?: HTMLElement): void {
     if (!overlay) {
         const localOverlay = new ChatOverlay({
             closeable: true,
             allowImageUpload: false,
+            anchorEl,
             onClose: () => {
                 client?.close();
                 client = undefined;
